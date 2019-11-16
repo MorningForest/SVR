@@ -1,8 +1,7 @@
-from sklearn.svm import SVR
+from sklearn.ensemble import GradientBoostingRegressor
 import numpy as np 
-import pandas as pd 
-import matplotlib.pyplot as plt 
-
+import pandas as pd
+import matplotlib.pyplot as plt
 
 def load_data(filepath=r"data.csv", isTraining=True, days=7):
     data = np.array(pd.read_csv(filepath,encoding="utf-8"))[:,1]
@@ -19,14 +18,19 @@ def load_data(filepath=r"data.csv", isTraining=True, days=7):
     return x_data, y_data
 
 def train(x_data, y_data):
-    clf = SVR(kernel='linear', C=1.0, epsilon=0.2)
-    model = clf.fit(x_data, y_data)
-    return model
+    model = GradientBoostingRegressor(
+      n_estimators=100,
+      learning_rate=0.1,
+      loss='ls'
+    )
+    return  model.fit(x_data, y_data)
 
-def test(x_data, model):
-    return model.predict(x_data)
+def test(x_test, model):
+    return model.predict(x_test)
 
 def plot_graph(y_test, y_pred):
+    plt.figure()
+    plt.style.use('dark_background')
     plt.plot(y_pred, color='r', label=r"y_pred")
     plt.plot(y_test, color='c', label=r"y_true")
     plt.legend(loc='upper left')
@@ -41,7 +45,6 @@ def losses(y_pred, y_true):
       "MAE:{}\n".format(MAE),
       "MAPE:{}".format(MAPE)
     )
-    
 
 def main():
     x_data, y_data = load_data()
